@@ -1,0 +1,13 @@
+# env files to ignore
+.env
+
+# do not upload lock files
+package-lock.json
+yarn.lock
+
+# directories never to upload
+bin/
+build/
+dist/
+lib/
+node_modules/

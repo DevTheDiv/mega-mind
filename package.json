@@ -1,0 +1,48 @@
+{
+  "name": "mega-mind",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "bin": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx tsx src/index.ts",
+    "dev": "npx tsx watch src/index.ts",
+    "windows-utils": "cmd.exe /k \"C:\\Program Files (x86)\\Windows Kits\\10\\Assessment and Deployment Kit\\Deployment Tools\\DandISetEnv.bat\"",
+    "build-iso": "MakeWinPEMedia /ISO F:\\mounts\\nnos\\WinPE_amd64 F:\\mounts\\nnos\\image.iso",
+    "mount-image": "DISM /Mount-Image /ImageFile:\"F:\\mounts\\nnos\\WinPE_amd64\\media\\sources\\boot.wim\" /Index:1 /MountDir:\"C:\\mounts\\image\"",
+    "commit-image": "Dism /Commit-Image /MountDir:\"C:\\mounts\\image\"",
+    "unmount-image": "Dism /Unmount-Image /MountDir:\"C:\\mounts\\image\" /Commit",
+    "pushin-image": "..\\pushinimage.bat",
+    "build": "npx tsc && pkg ."
+  },
+  "author": "",
+  "license": "ISC",
+  "pkg": {
+    "targets": [
+      "node18-win-x64"
+    ],
+    "outputPath": "build"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "tsx": "^3.13.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@guyun/wmic": "^1.2.0",
+    "@types/node": "^20.7.2",
+    "@types/papaparse": "^5.3.9",
+    "alphanumerize": "^1.0.0",
+    "axios": "^1.5.1",
+    "change-case-all": "^1.0.15",
+    "dotenv": "^16.3.1",
+    "edge-js": "^19.3.0",
+    "node-librehardwaremonitor": "^1.0.6",
+    "node-powershell": "^5.0.1",
+    "node-wmi": "^0.0.5",
+    "papaparse": "^5.4.1",
+    "pkg": "^5.8.1",
+    "systeminformation": "^5.21.9"
+  }
+}

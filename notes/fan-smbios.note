@@ -1,0 +1,3 @@
+
+
+Win32_Fan instances are provided by Windows\System32\wbem\cimwin32.dll. If you disassemble it you will see that it reads SMBIOS data (specifically entries with type 27) to get fan device information. So having no such instances means your system manufacturer did not write fan device info into SMBIOS, which is part of ROM.
