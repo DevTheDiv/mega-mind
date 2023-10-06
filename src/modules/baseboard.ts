@@ -4,35 +4,35 @@ import { spawnSync } from "child_process";
 
 import alphanumerize from "alphanumerize";
 import { resolve } from "path";
-import Papa from "papaparse";
+import * as Papa from "papaparse";
 
 
 interface IWminBaseboard {
 }
 
-const wmicBaseboard = () => new Promise<[IWminBaseboard[], string]>((accept, reject) =>  {
+
+import { PowerShell } from "node-powershell";
+
+const wmicBaseboard = async () : Promise<[IWminBaseboard[], string]> =>  {
+    let ps =  PowerShell.$`Get-WmiObject win32_baseboard | ConvertTo-Json`;
+
+    let {stderr, stdout } = await ps;
+
     let wmic = spawnSync("wmic", [ "baseboard", "get", "*", "/format:csv"], {
         encoding: "utf-8"
     });
     
-    if(wmic.error) return reject(wmic.error);
+    let _json = stdout?.toString() || "[]";
+    let _err = stderr?.toString() || "";
+    
+    if(_err) throw new Error(_err);
 
-   
-    let _wmic = wmic.stdout.toString().replace(/\r\r/g, "");
-    // remove first and last characters
-    _wmic = _wmic.substring(1, _wmic.length - 1);
-
-
-    let {data} = Papa.parse<IWminBaseboard>(_wmic, {
-        delimiter: ",",
-        newline: "\n",
-        header: true,
-        dynamicTyping: true
-    });
+    let psdata = JSON.parse(_json);
 
 
-    accept([data, _wmic]);
-})
+
+    return [psdata, _json];
+}
 
 
 export default async () => {

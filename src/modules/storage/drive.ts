@@ -3,7 +3,6 @@ import {exec, spawn, spawnSync, execSync} from "child_process";
 
 import alphanumerize from "alphanumerize";
 import { resolve } from "path";
-import Papa from "papaparse";
 import { PowerShell } from "node-powershell";
 
 import {camelCase} from "change-case-all";
@@ -11,41 +10,6 @@ import {camelCase} from "change-case-all";
 
 const _smartctl ="\\Program\ Files\\smartmontools\\bin\\smartctl.exe";
 
-interface ISmartScan {
-    pathLinux: string;
-    type?: string;
-}
-
-interface ISmartInfo {
-    serial?: string;
-    wwn?: string;
-    model?: string;
-    modelFamily?: string;
-    deviceModel?: string;
-    firmwareVersion?: string;
-    rotationRate?: number;
-    userCapacity?: string;
-    sectorSize?: number;
-    smartSupport?: boolean;
-    smartEnabled?: boolean;
-    formFactor?: string;
-}
-
-interface IWmicDrive {
-    model?: string;
-    deviceid: string;
-    serialNumber?: string;
-    pathWindows: string;
-    interfaceType?: string;
-    index: number,
-    sectors: number,
-    size: number,
-    partitions: number
-}
-
-interface ISmartDrive extends ISmartScan, ISmartInfo {
-    
-}
 
 
 
@@ -54,9 +18,7 @@ interface IFSUtilSectorInfo {
     physicalBytesPerSectorForPerformance: number
 }
 
-interface IDrive extends ISmartScan, ISmartInfo, IWmicDrive {
-    partitionStyle?: string;
-}
+
 
 
 
@@ -64,47 +26,29 @@ let log = (command: string, data: string) => {
     return `${command}\n ${data}\n\n`;
 };
 
-let smartAllInfo = (drive: string) : Promise<[ISmartInfo, string]> => new Promise((resolve, reject) =>  {
-    let smartctlInfo = spawnSync(_smartctl, ["-j", "-i", drive], {
+let smartAllInfo = async (drive: string) : Promise<[ISmartDrive, string]> =>   {
+    let smartctlInfo = spawnSync(_smartctl, ["-j", "-x", drive], {
         encoding: "utf8"
     });
 
-    if(smartctlInfo.error) return reject(smartctlInfo.stderr.toString());
+    if(smartctlInfo.error) throw new Error(smartctlInfo.stderr.toString());
     
     let _smartInfo = smartctlInfo.stdout.toString();
-
-    // console.log(smartctlInfo, _smartInfo)
-    let _smartInfoJSON : {model_family: string, serial_number: string, wwn: string, firmware_version: string, user_capacity: string, physical_block_size: number, rotation_rate: number, form_factor: {name:string}} = JSON.parse(_smartInfo);
-
-    let smartInfo : ISmartInfo = {};
-
+    let smartInfo = JSON.parse(_smartInfo);
     
-    let modelFamily = _smartInfoJSON["model_family"];
-    // let model = _smartInfoJSON["smartctl"]["model_name"];
+    // rename all keys to camelCase
+    smartInfo = (Object.fromEntries(Object.entries(smartInfo).map(([k, v]) => [camelCase(k), v])) as Record <keyof ISmartDrive, any>) as ISmartDrive;
+    // @ts-ignore
+    delete smartInfo.smartctl;
+    // @ts-ignore
+    delete smartInfo.jsonFormatVersion;
+    // @ts-ignore
+    delete smartInfo.localTime;
 
-    let serial = _smartInfoJSON["serial_number"];
-    let wwn = _smartInfoJSON["wwn"];
-    let firmwareVersion = _smartInfoJSON["firmware_version"];
-    let userCapacity = _smartInfoJSON["user_capacity"];
-    let sectorSize = _smartInfoJSON["physical_block_size"];
-    let rotationRate = _smartInfoJSON["rotation_rate"];
-    let formFactor = _smartInfoJSON["form_factor"]?.["name"];
-
-    // console.log(_smartInfo);
-    smartInfo = {
-        modelFamily: modelFamily,
-        // deviceModel: deviceModel,
-        serial,
-        wwn: wwn,
-        firmwareVersion: firmwareVersion,
-        userCapacity: userCapacity,
-        // sectorSize: sectorSize,
-        rotationRate: rotationRate,
-        formFactor: formFactor
-    };
+    // console.log(smartInfo);
     
-    return resolve([smartInfo, log(`${_smartctl} -j -i ${drive}`, _smartInfo)]);
-});
+    return [smartInfo, log(`${_smartctl} -j -i ${drive}`, _smartInfo)];
+}
 
 
 
@@ -122,7 +66,7 @@ const fsutilSectorInfo = (pathWindows: string) => new Promise<[IFSUtilSectorInfo
     let bytesPerSectorForAtom : string | number
         = o.match(/PhysicalBytesPerSectorForAtomicity :\s+([0-9]+)/)?.[1] || "-1";
     let bytesPerSectorForPerf : string | number
-        = o.match(/PhysicalBytesPerSectorForPerformance :\s+([0-9]+)/)?.[1] || "-1";
+        = o.match(/PhysicalBytesPerSectorForPerformance :\s+([0-9]+)/)?.[1] || "-1";    
 
     bytesPerSectorForAtom = parseInt(bytesPerSectorForAtom);
     bytesPerSectorForPerf = parseInt(bytesPerSectorForPerf);
@@ -134,31 +78,25 @@ const fsutilSectorInfo = (pathWindows: string) => new Promise<[IFSUtilSectorInfo
 });
 
 
-let wmicDrives =  async () : Promise<[IWmicDrive[], string]> =>  {
-
+let wmicDrives =  async () : Promise<[IWin32_DiskDrive[], string]> =>  {
     let ps = PowerShell.$`Get-CimInstance -ClassName Win32_DiskDrive -Property * | ConvertTo-Json`;
-
     let {stdout, stderr} = await ps;
     let psOut = stdout?.toString() || "[]";
     let psErr = stderr?.toString() || "";
 
     if(psErr) throw new Error(psErr?.toString() || "Unknown Error"); 
 
-    let wmicData : IWmicDrive[] = JSON.parse(psOut);
-    wmicData = wmicData.map((d: IWmicDrive) => {
+    let wmicData : IWin32_DiskDrive[] = JSON.parse(psOut);
+    wmicData = wmicData.map((d: IWin32_DiskDrive) => {
         //@ts-ignore
         delete d["CimInstanceProperties"];
         //@ts-ignore
         delete d["CimSystemProperties"];
         //@ts-ignore
         delete d["CimClass"];
-
         // lowercase all keys
-        const newObj = Object.fromEntries(
-            Object.entries(d).map(([k, v]) => [camelCase(k), v])
-        ) as Record <keyof IWmicDrive, any>;
-
-        d = newObj;
+        const newObj = Object.fromEntries(Object.entries(d).map(([k, v]) => [camelCase(k), v])) as Record <keyof IWin32_DiskDrive, any>;
+        d = newObj as IWin32_DiskDrive;
         return d;
     });
 
@@ -175,46 +113,82 @@ let getPartitionStyle = async (drive:number) : Promise<[string, string]> => {
     return [psOut, psOut];
 }
 
+let getPhysicalDisk = async (drive: number) : Promise<[IMSFT_PhysicalDisk, string]> => {
+    let ps = PowerShell.$`Get-Disk -Number ${drive} | Get-PhysicalDisk | ConvertTo-Json`;
+    let {stdout, stderr} = await ps;
+    let psOut = stdout?.toString() || "[]";
+    let psErr = stderr?.toString() || "";
 
-const hdparmDebug = (drive: string) => new Promise((accept, reject) => {
-    let _hdparm = spawnSync("\\Program\ Files\\hdparm\\hdparm.exe", ["--debug", drive], {
-        encoding: "utf8"
-    });
+    if(psErr) throw new Error(psErr?.toString() || "Unknown Error");
+    
+    let wmicData : IMSFT_PhysicalDisk = JSON.parse(psOut);
+    //@ts-ignore
+    delete wmicData["CimInstanceProperties"];
+    //@ts-ignore
+    delete wmicData["CimSystemProperties"];
+    //@ts-ignore
+    delete wmicData["CimClass"];
+    // lowercase all keys
+    const newObj = Object.fromEntries(Object.entries(wmicData).map(([k, v]) => [camelCase(k), v])) as Record <keyof IMSFT_PhysicalDisk, any>;
 
-    if(_hdparm.error) return reject(_hdparm.error);
+    if(newObj.mediaType === "Unspecified") newObj.mediaType = "";
 
-    let output = _hdparm.output.toString();
-    let drivePath = output.match(/(\\\\\.\\PhysicalDrive[0-9]+)/)?.[1];
-    return accept(drivePath?.toUpperCase());
-});
+    return [newObj, psOut];
+}
 
 export default async () =>  {
 
     let [wdrives] = await wmicDrives();
 
-
-
-    let drives : ISmartDrive[] = [];
+    let drives : IDrive[] = [];
 
     for (let i = 0; i < wdrives.length; i++) {
         let wdrive = wdrives[i];
+
         let alphaIndex = alphanumerize(wdrive.index + 1);
         let pathLinux = `/dev/sd${alphaIndex}`;
-        let physicalPath = `/dev/pd${alphaIndex}`;
         let [smartInfoDrive] = await smartAllInfo(pathLinux);
         let [partitionStyle] = await getPartitionStyle(wdrive.index);
 
+        let [physicalDisk] = await getPhysicalDisk(wdrive.index);
+        // console.log(physicalDisk)
+
+        // prefer smart info since it is more accurate
+
+        let serial = smartInfoDrive.serialNumber || physicalDisk.fruId || physicalDisk.serialNumber || wdrive.serialNumber || "Unknown";
         let drive : IDrive = {
-            ...wdrive,
-            ...smartInfoDrive,
+            index: wdrive.index,
+            serial: serial,
+            uniqueId: physicalDisk.uniqueId || serial || "Unknown",
+            model: smartInfoDrive.modelName || wdrive.model || "Unknown",
+            pathWindows: wdrive.deviceId,
             pathLinux,
-            partitionStyle
+            partitionCount: wdrive.partitions,
+            size: smartInfoDrive?.userCapacity?.bytes|| wdrive.size || -1,
+            logicalSectorSize: physicalDisk.logicalSectorSize || wdrive.bytesPerSector|| -1,
+            physicalSectorSize:  physicalDisk.physicalSectorSize || wdrive.bytesPerSector|| -1,
+            busType: physicalDisk.busType || smartInfoDrive?.device?.type || wdrive.interfaceType || "Unknown",
+            mediaType: physicalDisk.mediaType || wdrive.mediaType || "Unknown",
+            scsi: {
+                host: wdrive.scsiPort,
+                channel: wdrive.scsiBus,
+                target: wdrive.scsiTargetId,
+                lun: wdrive.scsiLogicalUnit
+            },
+            firmware: smartInfoDrive.firmwareVersion || wdrive.firmwareRevision || "Unknown",
+            partitionStyle,
+            wmiDiskDrive: wdrive,
+            smartInfo: smartInfoDrive,
         };
 
-        // console.log(drive)
-        // @ts-ignore
-        console.log(drive.size / drive.totalSectors)
-        // drives.push(drive);
+
+        //@ts-ignore
+        delete drive.smartInfo
+        //@ts-ignore
+        delete drive.wmiDiskDrive;
+
+        //@ts-ignore
+        drives.push(drive);
     }
 
     // console.log(drives);

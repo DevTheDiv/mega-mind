@@ -32,14 +32,29 @@ const partitions = async ()  : Promise<[any[], string]> => {
     return [json, psOut];
 }
 
-const getDiskPartitions = async () => {
-    let ps = PowerShell.$`Get-Disk | Get-Partition | ConvertTo-Json`;
+const getDiskPartitions = async (disk : number) => {
+    let ps = PowerShell.$`Get-Disk -Number ${disk} | Get-Partition | ConvertTo-Json`;
+    let {stdout, stderr} = await ps;
+    
+    let psOut = stdout?.toString() || "[]";
+    let psErr = stderr?.toString() || "";
+
+
+    if(psErr) throw new Error(stderr?.toString() || "Unknown Error");
+
+    
+
+    let json : Array<any> = JSON.parse(psOut);
+
+    if(!Array.isArray(json)) json = [json]; 
+
+    return [json, psOut];
 
 };
 
-(async () => {
 
-    let [j] = await partitions();
-    console.log(j);
+export default async (driveNumber: number) => {
+    let [j] = await getDiskPartitions(driveNumber);
 
-})()
+    return j;
+};

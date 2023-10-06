@@ -4,7 +4,7 @@ import { spawnSync } from "child_process";
 
 import alphanumerize from "alphanumerize";
 import { resolve } from "path";
-import Papa from "papaparse";
+import * as Papa from "papaparse";
 
 
 interface IWminDIMM {

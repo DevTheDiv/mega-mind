@@ -4,7 +4,7 @@ import { spawnSync } from "child_process";
 
 import alphanumerize from "alphanumerize";
 import { resolve } from "path";
-import Papa from "papaparse";
+import * as Papa from "papaparse";
 
 
 interface IWminProduct {
@@ -36,6 +36,6 @@ const wmicProduct = () => new Promise<[IWminProduct[], string]>((accept, reject)
 
 
 export default async () => {
-    let [e] =  await wmicProduct()
+    let [e] =  await wmicProduct(); 
     return e;
 };
