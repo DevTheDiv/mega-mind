@@ -29,3 +29,6 @@ type uint<T extends bitwidth> = T extends 8
     : T extends 64
     ? _uint64
     : never;
+
+  declare module 'cli-html';
+  declare module 'ink';

@@ -11,15 +11,15 @@ const config = {
   },
   module: {
     rules: [
-      {
-        test: /\.ts$/, // Assuming TypeScript files
-        use: 'ts-loader', // You'll need to have ts-loader installed
-        exclude: /node_modules/,
-      },
+      { 
+        test: /\.tsx?$/,
+        use: ['babel-loader', 'ts-loader'],
+        exclude: /node_modules/
+      }
     ],
   },
   resolve: {
-    extensions: ['.ts', '.js', ".json"], // Add other extensions you use
+    extensions: ['.ts', '.js', '.json', '.jsx', '.tsx'], // Add other extensions you use
   },
 //   externals: [/node_modules/], // Exclude node_modules from bundling 
 };
