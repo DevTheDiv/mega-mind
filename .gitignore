@@ -5,6 +5,7 @@
 package-lock.json
 yarn.lock
 
+
 # directories never to upload
 bin/
 build/
@@ -12,3 +13,12 @@ dist/
 lib/
 node_modules/
 rollup/
+
+
+# scripts
+*.cmd
+*.bat
+
+
+#misc
+yarn-error.log
