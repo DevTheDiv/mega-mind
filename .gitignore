@@ -14,6 +14,9 @@ lib/
 node_modules/
 rollup/
 
+#files to never upload
+src/scratch.ts
+src/modules/busyBench.ts
 
 # scripts
 *.cmd
