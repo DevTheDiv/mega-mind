@@ -3,7 +3,7 @@
 import React, {useState, useEffect, FC} from 'react';
 import {Box, Text, Spacer} from 'ink';
 
-import ram from '../modules/windows/ram.js';
+import ram from '../modules/windows/ram';
 
 let a =  (props : {}) => {
 

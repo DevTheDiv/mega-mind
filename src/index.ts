@@ -28,14 +28,16 @@ async function main() {
     
     const {render} = await import("ink");
 
-    let {default:App} = await import("./app.jsx");
+    let {default:App} = await import("./app");
     // let { render } = await import("ink");
+
+    console.log(render)
 
     // // getTicket("275384");
 
 
 
-    render(React.createElement(App));
+    // render(React.createElement(App));
 }
 
 
