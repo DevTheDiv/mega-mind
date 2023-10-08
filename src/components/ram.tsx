@@ -3,7 +3,7 @@
 import React, {useState, useEffect, FC} from 'react';
 import {Box, Text, Spacer} from 'ink';
 
-import ram from '../modules/ram.js';
+import ram from '../modules/windows/ram.js';
 
 let a =  (props : {}) => {
 
@@ -23,7 +23,7 @@ let a =  (props : {}) => {
     if(data.length === 0) {
         return (
             <Box>
-                <Text>Loading Ram Information...</Text>
+                <Text>Loading RAM Information...</Text>
             </Box>
         );
     }

@@ -3,7 +3,7 @@
 import React, {useState, useEffect, FC} from 'react';
 import {Box, Text, Spacer} from 'ink';
 
-import baseboard from '../modules/baseboard.js';
+import baseboard from '../modules/windows/baseboard.js';
 
 let a =  (props : {}) => {
 
