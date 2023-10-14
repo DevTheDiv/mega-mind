@@ -16,12 +16,19 @@ const config = __babel => {
       path: path.resolve(__dirname, "output", "bundled"),
       publicPath: './',
       chunkFormat: "commonjs",
-      assetModuleFilename: 'assets/[name][ext]'
+      assetModuleFilename: 'assets/[hash]/[name][ext]'
     },
     module: {
       parser: {
         javascript : { importMeta: false }
       },
+      defaultRules: [
+        "...",
+        {
+          test: /\.wasm$/i,
+          use: "null-loader"
+        }
+      ],
       rules: [
         // By default the wasm files fail to load with file-loader probably because the lib is esm only in mind
         {
@@ -33,6 +40,17 @@ const config = __babel => {
             replace: '__filename',
             flags: 'g'
           }
+        },
+        // we are going to inline json assets into the bundle
+        {
+          test: /node_modules\/cfonts\/.+\.json/,
+          include: [path.resolve("node_modules/cfonts/")],
+          type: 'asset/inline',
+          // loader: "file-loader",
+          // type: 'javascript/auto',
+          // options: {
+          //   name: 'assets/[hash]/[name].[ext]'
+          // }        
         }
       ]
     },

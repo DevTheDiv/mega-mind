@@ -9,8 +9,8 @@ import Gradient from 'ink-gradient';
 //@ts-ignore
 import {Box, Text}  from "ink";
 
-// import BaseBoard from './components/baseboard';
-// import Ram from './components/ram';
+import BaseBoard from './components/baseboard.js';
+import Ram from './components/ram.js';
 
 let sleep = (ms:number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -30,7 +30,7 @@ export default () => {
     return (
         <Box borderStyle="round" flexDirection="column" alignItems="center"  width={120}>
             <Gradient name="rainbow">
-                <BigText text="Mega Mind"/>
+                <Text bold>Mega Mind</Text>
             </Gradient>
             <Box paddingBottom={2}><Text bold>DIAGNOSTICS</Text></Box>
             <Box flexDirection="column" borderStyle="classic" gap={1} padding={2} paddingTop={1} paddingBottom={1}>
@@ -39,8 +39,8 @@ export default () => {
                 </Box>
                 <Text>Problems & Issues: https://github.com/DevTheDiv/mega-mind/issues</Text>
             </Box>
-            {/* <BaseBoard/>
-            <Ram/> */}
+            <BaseBoard/>
+            <Ram/>
         </Box>
     );
 };
