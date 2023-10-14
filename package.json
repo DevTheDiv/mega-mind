@@ -4,8 +4,11 @@
   "name": "mega-mind",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index",
-  "bin": "build/main.js",
+  "type": "module",
+  "main": "src/index.ts",
+  "bin": {
+    "app": "output/bundled/main.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx tsx src/index.ts",
@@ -18,45 +21,49 @@
     "image:commit": "Dism /Commit-Image /MountDir:\"C:\\mounts\\image\"",
     "image:push": "..\\pushinimage.bat",
     "image:iso": "MakeWinPEMedia /ISO F:\\mounts\\nnos\\WinPE_amd64 F:\\mounts\\nnos\\image.iso",
-    "build": "tsc",
-    "build:webpack": "yarn patch && webpack-cli --config webpack.config.js",
-    "build:bin": "yarn build:webpack && yarn pkg",
-    "build:debug": "yarn build:bin && yarn pkg:test",
+    "build": "yarn build:ts && yarn build:webpack && yarn build:bin",
+    "build:ts": "tsc",
+    "build:webpack": "webpack-cli --config webpack.config.cjs",
+    "build:bin": "yarn pkg",
     "patch": "node patches/patch.js",
-    "pkg": "npx pkg .",
+    "pkg": "npx pkg . --harmony-top-level-await",
     "pkg:test": "bin/mega-mind.exe"
   },
   "pkg": {
-    "scripts": "build/*.js",
-    "assets": "build/**",
-    "targets": [
-      "node14-windows-x64"
+    "scripts": "output/bundled/*.js",
+    "assets": [
+      "output/bundled/**/*",
+      "node_modules/**/*"
     ],
-    "outputPath": "./bin"
+    "targets": [
+      "node18-windows-x64"
+    ],
+    "options": [
+      "experimental-modules",
+      "experimental-top-level-await",
+      "harmony-top-level-await"
+    ],
+    "outputPath": "./output/bin"
   },
   "devDependencies": {
     "@babel/cli": "^7.23.0",
     "@babel/core": "^7.23.0",
     "@babel/parser": "^7.23.0",
-    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
-    "@babel/plugin-syntax-top-level-await": "^7.14.5",
-    "@babel/plugin-transform-async-to-generator": "^7.22.5",
-    "@babel/plugin-transform-modules-commonjs": "^7.23.0",
     "@babel/preset-env": "^7.22.20",
     "@babel/preset-react": "^7.22.15",
     "@babel/preset-typescript": "^7.23.0",
+    "@babel/runtime-corejs3": "^7.23.1",
     "@inquirer/prompts": "^3.2.0",
     "@types/ink-big-text": "^1.2.2",
     "@types/ink-gradient": "^2.0.2",
-    "@types/ink-table": "^1.0.4",
     "@types/inquirer": "^9.0.3",
-    "@types/node": "^20.7.2",
+    "@types/node": "^20.8.4",
     "@types/papaparse": "^5.3.9",
     "@types/react": "^18.2.25",
     "babel-core": "^6.26.3",
     "babel-loader": "^9.1.3",
-    "babel-plugin-module-resolver": "^5.0.0",
     "copy-webpack-plugin": "^11.0.0",
+    "node-loader": "^2.0.0",
     "pkg": "^5.8.1",
     "react-devtools-core": "^4.28.4",
     "ts-loader": "^9.4.4",
@@ -71,7 +78,7 @@
     "alphanumerize": "^1.0.0",
     "change-case-all": "^1.0.15",
     "cli-html": "^4.0.1",
-    "core-js": "3",
+    "core-js": "^3.33.0",
     "dotenv": "^16.3.1",
     "ink": "^4.4.1",
     "ink-ascii": "^0.0.4",
@@ -81,6 +88,8 @@
     "inquirer": "^9.2.11",
     "node-powershell": "^5.0.1",
     "papaparse": "^5.4.1",
-    "react": "^18.2.0"
+    "react": "^18.2.0",
+    "replace-in-src-webpack-plugin": "^2.1.0",
+    "string-replace-loader": "^3.1.0"
   }
 }

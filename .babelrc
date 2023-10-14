@@ -2,14 +2,11 @@
 // https://www.npmjs.com/package/babel-plugin-module-resolver
 {
   "presets": [
-    // ["@babel/preset-env"],
+    ["@babel/preset-env", { "corejs": 3}],
       "@babel/preset-typescript",
       "@babel/preset-react"
     ],
   "plugins": [
-    ["@babel/plugin-syntax-dynamic-import"],
-    "@babel/plugin-transform-modules-commonjs"
-      // "@babel/proposal-class-properties",
-      // "@babel/proposal-object-rest-spread"
+    ["@babel/plugin-syntax-dynamic-import"]
   ]
 }

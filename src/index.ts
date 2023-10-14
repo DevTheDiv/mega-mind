@@ -16,29 +16,28 @@
 //https://vangware.com/libraries/vangware_ansi/#-node
 
 
-import * as dotEnv from "dotenv";
+//@ts-ignore
+globalThis.navigator = {
+    userAgent: 'node.js' // Simulate a user agent to satisfy openpgp.js dependencies
+};
+
+
 
 import React from "react";
+import * as dotEnv from "dotenv";
+//@ts-ignore
+import {render} from "ink";
+
+import App from "./app.js";
+
 
 dotEnv.config();
 
 
-async function main() {
+(async() => {
 
+    render(
+        React.createElement(App)
+    );
     
-    const {render} = await import("ink");
-
-    let {default:App} = await import("./app");
-    // let { render } = await import("ink");
-
-    console.log(render)
-
-    // // getTicket("275384");
-
-
-
-    // render(React.createElement(App));
-}
-
-
-main();
+})();

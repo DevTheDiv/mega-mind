@@ -1,0 +1,41 @@
+
+
+  
+
+interface IWminDIMM {
+    Attributes: number,
+    BankLabel: string,
+    Capacity: number,
+    Caption: string,
+    ConfiguredClockSpeed: number,
+    ConfiguredVoltage: number,
+    DataWidth: 64,
+    Description: string, 
+    DeviceLocator: string,
+    FormFactor: number,
+    HotSwappable: unknown,
+    InstallDate: unknown,
+    InterleaveDataDepth: number,
+    InterleavePosition: number,
+    Manufacturer: string,
+    MaxVoltage: number,
+    MinVoltage: number,
+    MemoryType: number,
+    Model: string,
+    Name: string,
+    OtherIdentifyingInfo: unknown,
+    PositionInRow: number,
+    PartNumber: string,
+    PoweredOn: unknown,
+    Removable: unknown,
+    Replaceable: unknown,
+    SerialNumber: string,
+    SKU: unknown,
+    SMBIOSMemoryType: number,
+    Speed: number,
+    Status: unknown,
+    Tag: string,
+    TotalWidth: number,
+    TypeDetail: number,
+    version: unknown
+  }

@@ -11,6 +11,7 @@ bin/
 build/
 dist/
 lib/
+output/
 node_modules/
 rollup/
 

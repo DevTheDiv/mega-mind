@@ -17,4 +17,29 @@ fs.readFile(yogaPath, 'utf8', function(err, data) {
     }
 });
 
+
+let inkPath = path.resolve('.\\node_modules\\ink\\package.json');
+console.log("Checking:" + inkPath);
+fs.readFile(inkPath, 'utf8', function(err, data) {
+    if(err) return console.log(err);
+    let exports = {
+		".": {
+			"types": "./build/index.d.ts",
+			"default": "./build/index.js"
+		},
+		"./build/components/Box" : "./build/components/Box.js",
+        "./build/components/Text" : "./build/components/Text.js"
+	};
+
+    try {
+        let json = JSON.parse(data);
+        console.log("Patching: ", inkPath);
+        if(json.exports) json.exports = exports;
+        fs.writeFileSync(inkPath, JSON.stringify(json, null, 2), 'utf8');
+    }
+    catch(e) {
+        console.log(e);
+    }
+});
+
 console.log("Done Witch Patching");
