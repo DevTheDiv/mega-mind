@@ -12,6 +12,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx tsx src/index.ts",
+    "scratch": "npx tsx src/scratch.ts",
     "start:prod": "npx tsx build/index.js",
     "start:build": "yarn build:webpack && yarn start:prod",
     "dev": "npx tsx watch src/index.ts",
@@ -60,11 +61,10 @@
     "@types/node": "^20.8.4",
     "@types/papaparse": "^5.3.9",
     "@types/react": "^18.2.25",
+    "@types/estree": "^1.0.2",
     "babel-core": "^6.26.3",
     "babel-loader": "^9.1.3",
     "copy-webpack-plugin": "^11.0.0",
-    "ignore-loader": "^0.1.2",
-    "node-loader": "^2.0.0",
     "pkg": "^5.8.1",
     "react-devtools-core": "^4.28.4",
     "ts-loader": "^9.4.4",
@@ -73,15 +73,19 @@
     "tsx": "^3.13.0",
     "typescript": "^5.2.2",
     "webpack": "^5.88.2",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "core-js": "^3.33.0",
+    "file-loader": "^6.2.0",
+    "null-loader": "^4.0.1",
+    "node-loader": "^2.0.0",
+    "replace-in-src-webpack-plugin": "^2.1.0",
+    "string-replace-loader": "^3.1.0"
   },
   "dependencies": {
     "alphanumerize": "^1.0.0",
     "change-case-all": "^1.0.15",
     "cli-html": "^4.0.1",
-    "core-js": "^3.33.0",
     "dotenv": "^16.3.1",
-    "file-loader": "^6.2.0",
     "ink": "^4.4.1",
     "ink-ascii": "^0.0.4",
     "ink-big-text": "^2.0.0",
@@ -89,10 +93,7 @@
     "ink-table": "^3.0.0",
     "inquirer": "^9.2.11",
     "node-powershell": "^5.0.1",
-    "null-loader": "^4.0.1",
     "papaparse": "^5.4.1",
-    "react": "^18.2.0",
-    "replace-in-src-webpack-plugin": "^2.1.0",
-    "string-replace-loader": "^3.1.0"
+    "react": "^18.2.0"
   }
 }

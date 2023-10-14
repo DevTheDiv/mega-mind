@@ -1,0 +1,44 @@
+import os from 'os';
+import winram from "../modules/windows/ram.js";
+import { inherits } from 'util';
+
+
+// LOOK IRam is defined in the types folder
+
+class RamManager {
+    private ram: IRam[] = [];
+    async init() {
+        switch (os.platform()) {
+            case 'win32':
+                await this.loadWin();
+                break;
+            default:
+                break;
+        }
+        return this.ram;
+    }
+
+    private async loadWin() {
+        let _ram = await winram().catch(console.error);
+
+        if(!_ram) return;
+
+        for(let dimm in _ram ){
+            let {Speed, ConfiguredClockSpeed, Capacity, FormFactor, Manufacturer, SerialNumber, PartNumber, BankLabel, DeviceLocator} = _ram[dimm];
+
+            this.ram.push({
+                speed: Speed,
+                configuredSpeed: ConfiguredClockSpeed,
+                capacity: Capacity,
+                formFactor: FormFactor.toString(),
+                manufacturer: Manufacturer,
+                serialNumber: SerialNumber,
+                partNumber: PartNumber,
+                bank: BankLabel,
+                locator: DeviceLocator
+            });   
+        }
+    }
+}
+
+export default RamManager;

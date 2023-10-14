@@ -1,3 +1,6 @@
+
+// generic global types
+
 type bitwidth = 8 | 16 | 32 | 64;
 
 type _int8 = number;

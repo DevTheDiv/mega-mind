@@ -1,9 +1,0 @@
-
-
-import * as Ink from "ink";
-
-// declare module "ink" {
-//     export * from Ink;
-//     export {} from Ink;
-//     // export {default} from "ink";
-// }

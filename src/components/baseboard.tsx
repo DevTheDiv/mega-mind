@@ -4,24 +4,20 @@ import React, {useState, useEffect, FC} from 'react';
 // @ts-ignore
 import {Box, Text, Spacer} from 'ink';
 
-import baseboard from '../modules/windows/baseboard.js';
+
+import BoardManager from '../api/baseboard.js';
 
 let a =  (props : {}) => {
 
-    let [data, setData] = useState([{product:  'Loading...', serial: 'Loading...', manufacturer: 'Loading...'}]);
+    let [data, setData] = useState<IBaseboard[]>([]);
 
     useEffect(() => {
-        baseboard()
-        .then((board) => {
-            let { Product, SerialNumber, Manufacturer } = board as any;
-            setData([{product: Product, serial: SerialNumber, manufacturer: Manufacturer}]);
-        })
-        .catch((err) => {
-            setData([{product: 'Error', serial: 'Error', manufacturer: 'Error'}]);
-        });
+        let baseboard = new BoardManager();
+        baseboard.init().then(setData);
+
     }, []);
 
-    if(data[0].product === 'Loading...') {
+    if(!data.length) {
         return (
             <Box>
                 <Text>Loading Board Information...</Text>
@@ -42,8 +38,8 @@ let a =  (props : {}) => {
                     <Text bold>Manufacturer:</Text>
                 </Box>
                 <Box height="100%" flexDirection="column">
-                    <Text>{data[0].product}</Text>
-                    <Text>{data[0].serial}</Text>
+                    <Text>{data[0].partNumber}</Text>
+                    <Text>{data[0].serialNumber}</Text>
                     <Text>{data[0].manufacturer}</Text>
                 </Box>
             </Box>

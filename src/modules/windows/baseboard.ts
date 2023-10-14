@@ -7,20 +7,19 @@ import { resolve } from "path";
 import * as Papa from "papaparse";
 
 
-interface IWminBaseboard {
-}
 
 
 import { PowerShell } from "node-powershell";
 
-const wmicBaseboard = async () : Promise<[IWminBaseboard[], string]> =>  {
+const wmicBaseboard = async () : Promise<[IWminBaseboard, string]> =>  {
     let ps =  PowerShell.$`Get-WmiObject win32_baseboard | ConvertTo-Json`;
 
     let {stderr, stdout } = await ps;
 
-    let wmic = spawnSync("wmic", [ "baseboard", "get", "*", "/format:csv"], {
-        encoding: "utf-8"
-    });
+    // spawn example usage
+    // let wmic = spawnSync("wmic", [ "baseboard", "get", "*", "/format:csv"], {
+    //     encoding: "utf-8"
+    // });
     
     let _json = stdout?.toString() || "[]";
     let _err = stderr?.toString() || "";
@@ -37,5 +36,5 @@ const wmicBaseboard = async () : Promise<[IWminBaseboard[], string]> =>  {
 
 export default async () => {
     let [e] =  await wmicBaseboard()
-    return e;
+    return [e];
 };

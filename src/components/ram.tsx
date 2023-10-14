@@ -3,21 +3,27 @@ import React, {useState, useEffect, FC} from 'react';
 // @ts-ignore
 import {Box, Text, Spacer} from 'ink';
 
-import ram from '../modules/windows/ram.js';
+import RamManager from '../api/ram.js';
+
+
+
 
 let a =  (props : {}) => {
 
-    let [data, setData] = useState<IWminDIMM[]>([]);
+    let [data, setData] = useState<IRam[]>([]);
 
     useEffect(() => {
-        ram()
-        .then((ram) => {            
-            setData(ram);
-        })
-        .catch((err) => {
-            console.log(err);
-            setData([]);
-        });
+        let ram = new RamManager();
+        ram.init().then(setData);
+
+        // ram()
+        // .then((ram) => {            
+        //     setData(ram);
+        // })
+        // .catch((err) => {
+        //     console.log(err);
+        //     setData([]);
+        // });
     }, []);
 
     if(data.length === 0) {
@@ -47,11 +53,11 @@ let a =  (props : {}) => {
                 return (
                     <Box flexDirection="row" padding={0} paddingLeft={2} paddingRight={2}  alignItems="center" key={i} >
                         <Box height="100%" flexDirection="row" borderStyle="classic" justifyContent="space-around" width="100%">
-                            <Box><Text>{ram.BankLabel} - {ram.DeviceLocator}</Text></Box>
-                            <Box><Text>{ram.Capacity}</Text></Box>
-                            <Box><Text>{ram.ConfiguredClockSpeed}/{ram.Speed}</Text></Box>
-                            <Box><Text>{ram.Model || ram.PartNumber}</Text></Box>
-                            <Box><Text>{ram.SerialNumber}</Text></Box>
+                            <Box><Text>{ram.bank} - {ram.locator}</Text></Box>
+                            <Box><Text>{ram.capacity}</Text></Box>
+                            <Box><Text>{ram.configuredSpeed}/{ram.speed}</Text></Box>
+                            <Box><Text>{ram.partNumber}</Text></Box>
+                            <Box><Text>{ram.serialNumber}</Text></Box>
                         </Box>
                     </Box>
                 );
