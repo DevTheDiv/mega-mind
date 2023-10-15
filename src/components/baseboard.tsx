@@ -1,30 +1,11 @@
 
-import React, {useState, useEffect, FC} from 'react';
 
 // @ts-ignore
 import {Box, Text, Spacer} from 'ink';
 
 
-import BoardManager from '../api/baseboard.js';
-
-let a =  (props : {}) => {
-
-    let [data, setData] = useState<IBaseboard[]>([]);
-
-    useEffect(() => {
-        let baseboard = new BoardManager();
-        baseboard.init().then(setData);
-
-    }, []);
-
-    if(!data.length) {
-        return (
-            <Box>
-                <Text>Loading Board Information...</Text>
-            </Box>
-        );
-    }
-
+export default (props : {baseboard: IBaseboard[]}) => {
+    let baseboard = props.baseboard;
     return (
         <>
         <Box width={"100%"}  flexDirection="column">
@@ -38,17 +19,12 @@ let a =  (props : {}) => {
                     <Text bold>Manufacturer:</Text>
                 </Box>
                 <Box height="100%" flexDirection="column">
-                    <Text>{data[0].partNumber}</Text>
-                    <Text>{data[0].serialNumber}</Text>
-                    <Text>{data[0].manufacturer}</Text>
+                    <Text>{baseboard[0].partNumber}</Text>
+                    <Text>{baseboard[0].serialNumber}</Text>
+                    <Text>{baseboard[0].manufacturer}</Text>
                 </Box>
             </Box>
         </Box>
         </>
     );
 };
-
-// fix the type case
-let _a = a as unknown as FC<any>;
-
-export default _a;

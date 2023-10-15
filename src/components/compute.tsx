@@ -8,26 +8,9 @@ import {Box, Text, Spacer} from 'ink';
 
 import ComputeManager from '../api/compute.js';
 
-let a =  (props : {}) => {
+export default (props : { compute: ICompute[]}) => {
 
-    let [data, setData] = useState<ICompute[]>([]);
-
-    useEffect(() => {
-        let computeManager = new ComputeManager();
-
-        
-        computeManager.init().then(setData);
-
-    }, []);
-
-    if(!data.length) {
-        return (
-            <Box>
-                <Text>Loading Compute Information...</Text>
-            </Box>
-        );
-    }
-
+    let data = props.compute;
     return (
         <>
         <Box width={"100%"}  flexDirection="column">
@@ -57,5 +40,3 @@ let a =  (props : {}) => {
         </>
     );
 };
-
-export default a;

@@ -8,32 +8,8 @@ import RamManager from '../api/ram.js';
 
 
 
-let a =  (props : {}) => {
-
-    let [data, setData] = useState<IRam[]>([]);
-
-    useEffect(() => {
-        let ram = new RamManager();
-        ram.init().then(setData);
-
-        // ram()
-        // .then((ram) => {            
-        //     setData(ram);
-        // })
-        // .catch((err) => {
-        //     console.log(err);
-        //     setData([]);
-        // });
-    }, []);
-
-    if(data.length === 0) {
-        return (
-            <Box>
-                <Text>Loading RAM Information...</Text>
-            </Box>
-        );
-    }
-
+export default ({ram = []} : {ram: IRam[]}) => {
+    let data = ram;
     return (
         <>
         <Box width={"100%"}  flexDirection="column">
@@ -66,6 +42,3 @@ let a =  (props : {}) => {
         </>
     );
 };
-
-
-export default a;

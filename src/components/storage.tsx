@@ -4,25 +4,12 @@ import React, {useState, useEffect, FC} from 'react';
 import {Box, Text, Spacer} from 'ink';
 
 import StorageManager from '../api/storage.js';
+// @ts-ignore
 
-let a =  (props : {}) => {
+import Spinner from 'ink-spinner';
 
-    let [data, setData] = useState<IStorage[]>([]);
-
-    useEffect(() => {
-
-        let storageManager = new StorageManager();
-        storageManager.init().then(setData);
-    }, []);
-
-    if(data.length === 0) {
-        return (
-            <Box>
-                <Text>Loading Storage...</Text>
-            </Box>
-        );
-    }
-
+export default ({storage = []} : {storage: IStorage[]}) => {
+    let data = storage;
     return (
         <>
         <Box width={"100%"}  flexDirection="column">
@@ -47,6 +34,7 @@ let a =  (props : {}) => {
                             <Box><Text>{device.serialNumber || device.uniqueId}</Text></Box>
                             <Box><Text>{device.model}</Text></Box>
                             <Box><Text>{device.busType}</Text></Box>
+
                         </Box>
                     </Box>
                 );
@@ -55,6 +43,3 @@ let a =  (props : {}) => {
         </>
     );
 };
-
-
-export default a;
