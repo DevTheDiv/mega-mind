@@ -5,7 +5,7 @@ import winboard from "../modules/windows/baseboard.js";
 
 
 class BoardManager {
-    baseboard: IBaseboard[] = [];
+    devices: IBaseboard[] = [];
     async init() {
         switch (os.platform()) {
             case 'win32':
@@ -14,7 +14,7 @@ class BoardManager {
             default:
                 break;
         }
-        return this.baseboard;
+        return this.devices;
     }
 
     async loadWin() {
@@ -24,7 +24,7 @@ class BoardManager {
 
         for (let b in _board ){
             let {SerialNumber, PartNumber, Manufacturer, Product, Version} = _board[b];
-            this.baseboard.push({
+            this.devices.push({
                 serialNumber: SerialNumber,
                 partNumber: PartNumber || Product,
                 manufacturer: Manufacturer

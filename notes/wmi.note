@@ -9,6 +9,7 @@ Get-TPM
 Get-PnpDevice
 Get-CimInstance Win32_DeviceBus 
 Get-CimInstance Win32_PnPEntity
+Get-CimInstance Win32_Bus 
 
 
 
@@ -21,6 +22,7 @@ Get-WmiObject
 onboard connectors
 Get-CimInstance CIM_Slot 
 Get-CimInstance CIM_PhysicalConnector
+Get-CimInstance Win32_Bus 
 Get-CimInstance CIM_USBDevice
 Get-CimInstance CIM_USBHub
 

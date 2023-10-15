@@ -1,19 +1,19 @@
 // This is final interface for the middle man drive object that will be used by the app
 
-interface IDrive {
+interface IStorage {
     index: number;
     uniqueId: string;
-    serial: string;
+    serialNumber: string;
     model: string;
-    pathLinux: string;
-    pathWindows: string;
-    mediaType: string;
-    busType: string;
-    firmware: string;
-    partitionStyle?: string;
-    size: number;
+    paths: string[],
+    capacity: number;
+    useableCapacity: number;
     logicalSectorSize: number;
     physicalSectorSize: number;
+    totalSectors: number;
+    firmware: string;
+    mediaType: string;
+    busType: string;
     scsi: {
         host: number;
         channel: number;
@@ -21,6 +21,4 @@ interface IDrive {
         lun: number;
     },
     partitionCount: number;
-    wmiDiskDrive: IWin32_DiskDrive;
-    smartInfo: ISmartDrive;
 }

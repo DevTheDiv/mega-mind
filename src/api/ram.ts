@@ -6,7 +6,7 @@ import { inherits } from 'util';
 // LOOK IRam is defined in the types folder
 
 class RamManager {
-    private ram: IRam[] = [];
+    private devices: IRam[] = [];
     async init() {
         switch (os.platform()) {
             case 'win32':
@@ -15,7 +15,7 @@ class RamManager {
             default:
                 break;
         }
-        return this.ram;
+        return this.devices;
     }
 
     private async loadWin() {
@@ -26,7 +26,7 @@ class RamManager {
         for(let dimm in _ram ){
             let {Speed, ConfiguredClockSpeed, Capacity, FormFactor, Manufacturer, SerialNumber, PartNumber, BankLabel, DeviceLocator} = _ram[dimm];
 
-            this.ram.push({
+            this.devices.push({
                 speed: Speed,
                 configuredSpeed: ConfiguredClockSpeed,
                 capacity: Capacity,

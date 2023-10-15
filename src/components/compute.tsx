@@ -40,12 +40,17 @@ let a =  (props : {}) => {
                     <Text bold>Serial:</Text>
                     <Text bold>Socket:</Text>
                     <Text bold>Socket Type:</Text>
+                    <Text bold>Cores:</Text>
+                    <Text bold>vCores:</Text>
+
                 </Box>
                 <Box height="100%" flexDirection="column">
                     <Text>{data[0].name}</Text>
                     <Text>{data[0].serialNumber}</Text>
                     <Text>{data[0].socketNumber}</Text>
                     <Text>{data[0].socketType}</Text>
+                    <Text>{data[0].coreCount}/{data[0].physicalCoreCount}</Text>
+                    <Text>{data[0].logicalCoreCount}/{data[0].threadCount}</Text>
                 </Box>
             </Box>
         </Box>
@@ -53,7 +58,4 @@ let a =  (props : {}) => {
     );
 };
 
-// fix the type case
-let _a = a as unknown as FC<any>;
-
-export default _a;
+export default a;

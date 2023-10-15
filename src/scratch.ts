@@ -1,14 +1,11 @@
 
-// This file is used to test the api calls without having to use the cli ui
+
+import StorageManager from "./api/storage";
 
 
-// import wmicBaseboard from "./modules/windows/baseboard";
-// import wmicCompute from "./modules/windows/compute";
-import ComputeManager from "./api/compute";
+let storage = new StorageManager();
 
 
-// wmicCompute().then(console.log).catch(console.error);
-
-
-let cm = new ComputeManager();
-cm.init().then(console.log).catch(console.error);
+storage.init().then((devices) => {
+    console.log(devices);
+}).catch(console.error);
