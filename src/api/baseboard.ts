@@ -19,13 +19,11 @@ class BoardManager {
 
     async loadWin() {
         
-        let _board = await winboard().catch(console.error);
-        
-        if(!_board) return;
+        let [_board] = await winboard();
+        if(!_board) return; 
 
         for (let b in _board ){
-            console.log(_board[b]);
-            let {SerialNumber, PartNumber, Manufacturer, Product} = _board[b];
+            let {SerialNumber, PartNumber, Manufacturer, Product, Version} = _board[b];
             this.baseboard.push({
                 serialNumber: SerialNumber,
                 partNumber: PartNumber || Product,

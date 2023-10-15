@@ -1,18 +1,10 @@
 
-import { spawnSync } from "child_process";
-
-
-import alphanumerize from "alphanumerize";
-import { resolve } from "path";
-import * as Papa from "papaparse";
-
-
 
 
 import { PowerShell } from "node-powershell";
 
-const wmicBaseboard = async () : Promise<[IWminBaseboard[], string]> =>  {
-    let ps =  PowerShell.$`Get-WmiObject win32_baseboard | ConvertTo-Json`;
+const wmicCompute = async () : Promise<[IWminCompute[], string]> =>  {
+    let ps =  PowerShell.$`Get-WmiObject win32_processor | ConvertTo-Json`;
 
     let {stderr, stdout } = await ps;
 
@@ -26,9 +18,9 @@ const wmicBaseboard = async () : Promise<[IWminBaseboard[], string]> =>  {
     
     if(_err) throw new Error(_err);
 
-    let psdata : IWminBaseboard = JSON.parse(_json);
+    let psdata : IWminCompute = JSON.parse(_json);
 
     return [[psdata], _json];
 }
 
-export default wmicBaseboard;
+export default wmicCompute;

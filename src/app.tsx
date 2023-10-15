@@ -11,6 +11,7 @@ import {Box, Text}  from "ink";
 
 import BaseBoard from './components/baseboard.js';
 import Ram from './components/ram.js';
+import Compute from './components/compute.js';
 
 let sleep = (ms:number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -40,6 +41,7 @@ export default () => {
                 <Text>Problems & Issues: https://github.com/DevTheDiv/mega-mind/issues</Text>
             </Box>
             <BaseBoard/>
+            <Compute/>
             <Ram/>
         </Box>
     );

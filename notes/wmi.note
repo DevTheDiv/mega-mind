@@ -1,0 +1,36 @@
+https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/cimwin32-wmi-providers
+
+
+Get-ComputerInfo
+Get-NetAdapterHardwareInfo
+Get-TPM 
+
+
+Get-PnpDevice
+Get-CimInstance Win32_DeviceBus 
+Get-CimInstance Win32_PnPEntity
+
+
+
+
+Get-CimClass - to get class information
+Get-CimInstance - to get data from a class instance
+Get-WmiObject
+
+
+onboard connectors
+Get-CimInstance CIM_Slot 
+Get-CimInstance CIM_PhysicalConnector
+Get-CimInstance CIM_USBDevice
+Get-CimInstance CIM_USBHub
+
+
+chassis
+Get-CimInstance CIM_Chassis
+Get-CimInstance CIM_Battery
+
+cache
+Get-CimInstance CIM_Memory 
+
+#ipmi
+Get-PcsvDevice
