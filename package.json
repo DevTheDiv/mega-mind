@@ -82,11 +82,13 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@types/byte-size": "^8.1.0",
     "@wtfcode/byte-converter": "^2.0.8",
     "alphanumerize": "^1.0.0",
     "change-case-all": "^1.0.15",
     "cli-html": "^4.0.1",
     "dotenv": "^16.3.1",
+    "filesize": "^10.1.0",
     "ink": "^4.4.1",
     "ink-ascii": "^0.0.4",
     "ink-big-text": "^2.0.0",
