@@ -14,6 +14,8 @@ let smartXAllInfo = async (drive: string) : Promise<ISmartctlXAll> =>   {
     let _smartInfo = smartctlInfo.stdout.toString();
     let smartInfo : ISmartctlXAll = JSON.parse(_smartInfo);
         
+
+    
     return smartInfo;
 }
 

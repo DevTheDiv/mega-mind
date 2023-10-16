@@ -14,6 +14,7 @@ interface IStorage {
     firmware: string;
     mediaType: string;
     busType: string;
+    smart?: any,
     scsi: {
         host: number;
         channel: number;

@@ -68,20 +68,35 @@ export default ({storage = []} : {storage: IStorage[]}) => {
             </Box>       
             {data.map((device, i) => {
                 return (
-                    <Box flexDirection="row" padding={0} paddingLeft={2} paddingRight={2}  alignItems="center" key={i} >
-                        <Box height="100%" flexDirection="row" borderStyle="classic" width="100%" columnGap={1} paddingLeft={1} paddingRight={1}>
-                            <Box minWidth={minWidth.scsi}><Text>{device.scsi.channel}:{device.scsi.host}:{device.scsi.lun}:{device.scsi.target}</Text></Box>
-                            <Text>|</Text>
-                            <Box minWidth={minWidth.paths}><Text>{device.paths[0]}</Text></Box>
-                            <Text>|</Text>
-                            <Box minWidth={minWidth.model} flexGrow={1}><Text>{device.model}</Text></Box>
-                            <Text>|</Text>
-                            <Box minWidth={minWidth.serialNumber} flexGrow={1}><Text>{device.serialNumber || device.uniqueId}</Text></Box>
-                            <Text>|</Text>
-                            <Box minWidth={minWidth.busType}><Text>{device.busType}</Text></Box>
-                            <Text>|</Text>
-                            <Box minWidth={minWidth.useableCapacity}  ><Text>{filesize(device.useableCapacity, {round: 2})}</Text></Box>
+                    <Box flexDirection="column" key={i}>
+                        <Box flexDirection="row" padding={0} paddingLeft={2} paddingRight={2}  alignItems="center"  >
+                            <Box height="100%" flexDirection="row" borderStyle="classic" width="100%" columnGap={1} paddingLeft={1} paddingRight={1}>
+                                <Box minWidth={minWidth.scsi}><Text>{device.scsi.channel}:{device.scsi.host}:{device.scsi.lun}:{device.scsi.target}</Text></Box>
+                                <Text>|</Text>
+                                <Box minWidth={minWidth.paths}><Text>{device.paths[0]}</Text></Box>
+                                <Text>|</Text>
+                                <Box minWidth={minWidth.model} flexGrow={1}><Text>{device.model}</Text></Box>
+                                <Text>|</Text>
+                                <Box minWidth={minWidth.serialNumber} flexGrow={1}><Text>{device.serialNumber || device.uniqueId}</Text></Box>
+                                <Text>|</Text>
+                                <Box minWidth={minWidth.busType}><Text>{device.busType}</Text></Box>
+                                <Text>|</Text>
+                                <Box minWidth={minWidth.useableCapacity}><Text>{filesize(device.useableCapacity, {round: 2})}</Text></Box>
+                            </Box>
                         </Box>
+                        {
+                            device.smart?.enabled ? 
+                            <Box  flexDirection="row" padding={0} paddingLeft={2} paddingRight={2}  alignItems="center">
+                                <Text color={device.smart.healthy ? "green" : "red"}>Healthy: {`${device.smart.healthy}`}</Text>
+                                <Text>  ○  </Text>
+                                <Text color={device.smart.temperature < device.smart.temperatureMax? "green" : "red"}>Temparature (cur/max): {`${device.smart.temperature}/${device.smart.temperatureMax}`}℃ </Text>
+                                <Text>  ○  </Text>
+                                <Text color="blue">Hours: {`${device.smart.powerOnHours}`}</Text>
+                            </Box>
+                            :
+                            <></>
+                        }
+                        
                     </Box>
                 );
             })}

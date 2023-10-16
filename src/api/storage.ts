@@ -38,7 +38,7 @@ class StorageManager {
         this._wmicDisks = await wmicDiskDrive();
 
         for(let wd of this._wmicDisks){
-            let { Index, DeviceID, SerialNumber, Model, Size: UserCapacity, FirmwareRevision, SCSIBus, SCSILogicalUnit, SCSIPort, SCSITargetId, TotalSectors, Partitions, MediaType} = wd;
+            let { Index, DeviceID, SerialNumber, Size: UserCapacity, FirmwareRevision, SCSIBus, SCSILogicalUnit, SCSIPort, SCSITargetId, TotalSectors, Partitions, MediaType} = wd;
             let alpha = alphanumerize(Index + 1);
 
             let pd = await psGetPhysicalDisk(Index);
@@ -54,6 +54,8 @@ class StorageManager {
             let smart = await smartXAllInfo(paths[1]);
 
 
+            let { smart_support, power_on_time, temperature } = smart;
+
             let tmp : IStorage | null  = {
                 index: Index,
                 paths: paths,
@@ -68,6 +70,13 @@ class StorageManager {
                 firmware: FirmwareRevision,
                 mediaType: MediaType,
                 busType: BusType,
+                smart: {
+                    enabled: smart_support?.enabled,
+                    healthy: smart.smart_status?.passed,
+                    powerOnHours: power_on_time?.hours,
+                    temperature: temperature?.current,
+                    temperatureMax: temperature?.limit_max || 70
+                },
                 scsi: {
                     host: SCSIPort,
                     channel: SCSIBus,

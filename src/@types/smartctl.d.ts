@@ -1,4 +1,4 @@
-interface SmartCtl {
+interface ISmartctlXAll {
     json_format_version?: (number)[] | null;
     smartctl: Smartctl;
     local_time: LocalTime;
