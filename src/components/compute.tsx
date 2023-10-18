@@ -13,11 +13,11 @@ export default (props : { compute: ICompute[]}) => {
     let data = props.compute;
     return (
         <>
-        <Box width={"100%"}  flexDirection="column">
-            <Box width={"100%"} paddingLeft={2} paddingTop={2} >
+        <Box width={"100%"}  flexDirection="column" paddingLeft={2} paddingTop={1} paddingBottom={1}>
+            <Box width={"100%"} paddingBottom={1}>
                 <Text bold color={"green"}>CPU</Text>
             </Box>
-            <Box flexDirection="row" padding={1} paddingLeft={2} paddingRight={2}  alignItems="center" gap={2} >
+            <Box flexDirection="row" alignItems="center" gap={2} >
                 <Box height="100%" flexDirection="column">
                     <Text bold>Product:</Text>
                     <Text bold>Serial:</Text>
@@ -25,7 +25,6 @@ export default (props : { compute: ICompute[]}) => {
                     <Text bold>Socket Type:</Text>
                     <Text bold>Cores:</Text>
                     <Text bold>vCores:</Text>
-
                 </Box>
                 <Box height="100%" flexDirection="column">
                     <Text>{data[0].name}</Text>

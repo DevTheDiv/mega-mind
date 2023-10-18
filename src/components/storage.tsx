@@ -62,26 +62,26 @@ export default ({storage = []} : {storage: IStorage[]}) => {
     
     return (
         <>
-        <Box width={"100%"}  flexDirection="column">
-            <Box width={"100%"} padding={2} paddingBottom={1} paddingTop={1}>
+        <Box width={"100%"}  flexDirection="column"  rowGap={1} paddingTop={1} paddingBottom={1}>
+            <Box width={"100%"} padding={2} paddingBottom={0} paddingTop={0}>
                 <Text bold color="green">STORAGE</Text>
             </Box>       
             {data.map((device, i) => {
                 return (
-                    <Box flexDirection="column" key={i} paddingLeft={2} paddingRight={2}>
-                        <Box flexDirection="row" padding={0} paddingLeft={0} paddingRight={0} alignItems="center"  >
-                            <Box height="100%" flexDirection="row" width="100%" columnGap={2}>
+                    <Box key={i} flexDirection="column" width="100%" paddingLeft={2} paddingRight={2}>
+                        <Box flexDirection="row" width="100%" padding={0} paddingLeft={0} paddingRight={0}>
+                            <Box height="100%" flexDirection="row" width="100%" columnGap={2} justifyContent="space-between">
                                 <Box minWidth={minWidth.scsi}><Text>{device.scsi.channel}:{device.scsi.host}:{device.scsi.lun}:{device.scsi.target}</Text></Box>
-                                <Text>|</Text>
+                                <Text>│</Text>
                                 <Box minWidth={minWidth.paths}><Text>{device.paths[0]}</Text></Box>
-                                <Text>|</Text>
+                                <Text>│</Text>
                                 <Box minWidth={minWidth.model} flexGrow={1}><Text>{device.model}</Text></Box>
-                                <Text>|</Text>
+                                <Text>│</Text>
                                 <Box minWidth={minWidth.serialNumber} flexGrow={1}><Text>{device.serialNumber || device.uniqueId}</Text></Box>
-                                <Text>|</Text>
+                                <Text>│</Text>
                                 <Box minWidth={minWidth.busType}><Text>{device.busType}</Text></Box>
-                                <Text>|</Text>
-                                <Box minWidth={minWidth.useableCapacity}><Text>{filesize(device.useableCapacity, {round: 2})}</Text></Box>
+                                <Text>│</Text>
+                                <Box minWidth={minWidth.useableCapacity}  alignSelf="flex-end" justifyContent="flex-end"><Text>{filesize(device.useableCapacity, {round: 2})}</Text></Box>
                             </Box>
                         </Box>
                         {
@@ -96,6 +96,38 @@ export default ({storage = []} : {storage: IStorage[]}) => {
                             </Box>
                             :
                             <></>
+                        }
+                        {
+                            device.partitions.map((partition, i) => {
+                                
+                                let utilized = (partition.volume?.sizeRemaining || 1) / (partition.volume?.size || 1);
+                                let healthState = (partition.volume?.health || "Unknown").toString().toUpperCase();
+                                
+                                let healthColor = "red";
+                                if(healthState === "HEALTHY") healthColor = "green";
+                                else if(healthState === "UNKNOWN") healthColor = "yellow";
+
+ 
+                                
+                                let flags = [];
+                                if(partition.readonly) flags.push("RO");
+                                if(partition.boot) flags.push("B");
+                                if(partition.active) flags.push("A");
+
+                                return (
+                                    <>
+                                        <Box key={i} flexDirection="row" gap={2} justifyContent="space-between">
+                                            <Text>╰ Part {partition.partitionNumber} ({partition.identifier})</Text>
+                                            <Text>[{flags.join(",")}]</Text>
+                                            <Text>{partition.volume?.fileSystem}</Text>
+                                            <Text>{partition.volume?.label}</Text>
+                                            <Text color={healthColor}>{partition.volume?.health}</Text>
+                                            <Text>{100 - Math.round(utilized * 100)}%</Text>
+                                            <Text>{filesize(partition.size, {round: 2, standard: "jedec"})}</Text>
+                                        </Box>
+                                    </>
+                                );
+                            })
                         }
                         
                     </Box>

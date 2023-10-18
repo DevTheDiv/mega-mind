@@ -56,6 +56,42 @@ class StorageManager {
 
 
             let partitions = await psGetPartition(Index);
+
+            let _partitions : IPartition[] = [];
+
+
+
+            for (let _p of partitions) {
+                
+                let {Size: PartitionSize, DriveLetter, Guid, Type, IsActive, IsBoot, AccessPaths, PartitionNumber, DiskNumber, IsReadOnly, Volume}  = _p;
+                // not all partitions are readable to windows or have volumes
+                let {FileSystem, FileSystemLabel, HealthStatus: VolumeHealth, Path: VolumePath, AllocationUnitSize, SizeRemaining, Size : VolumeSize } = Volume || {};
+
+                let partition : IPartition = {
+                    active: IsActive,
+                    boot: IsBoot,
+                    identifier: DriveLetter || "_",
+                    type: Type,
+                    readonly: IsReadOnly || false,
+                    size: PartitionSize,
+                    offset: 0,
+                    uniqueId: Guid,
+                    guid: Guid,
+                    partitionNumber: PartitionNumber,
+                    volume: {
+                        health: VolumeHealth || "UNKNOWN",
+                        fileSystem: FileSystem || "N/A",
+                        uniqueId: Guid || "N/A",
+                        blockSize: AllocationUnitSize || -1,
+                        label: FileSystemLabel || "NO LABEL",
+                        size: VolumeSize || -1,
+                        sizeRemaining: SizeRemaining || -1
+                    }
+                }
+                _partitions.push(partition);
+            };
+
+
             
 
             let tmp : IStorage | null  = {
@@ -85,7 +121,8 @@ class StorageManager {
                     target: SCSITargetId,
                     lun: SCSILogicalUnit
                 },
-                partitionCount: Partitions
+                partitionCount: Partitions,
+                partitions: _partitions
             };
             let _storage = new StorageDevice(tmp);
             this.devices.push(_storage);

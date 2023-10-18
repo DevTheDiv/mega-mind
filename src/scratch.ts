@@ -60,7 +60,7 @@ let drives = ["/dev/sda", "/dev/sdb", "/dev/sdc", "/dev/sdd", "/dev/sde", "/dev/
 
 
                     
-                    console.log(p)
+                    // console.log(p)
                     
 
 
