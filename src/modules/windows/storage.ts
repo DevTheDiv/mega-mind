@@ -85,10 +85,32 @@ let psGetPartition = async (drive: number) : Promise<IPSGetPartition[]> => {
     let psErr = stderr?.toString() || "";
 
     if(psErr) throw new Error(psErr?.toString() || "Unknown Error");
+    let _data = JSON.parse(psOut);
+    let psData : IPSGetPartition[] = Array.isArray(_data) ? _data : [_data];
+
+    // now time to get the volume info
+    for(let p of psData) {
+        let {PartitionNumber} = p;
+        let [volume] = await psGetVolume(drive, PartitionNumber).catch(() => []);
+        p.Volume = volume;
+    }
     
-    let psData : IPSGetPartition[] = JSON.parse(psOut);
     return psData;
 };
+
+let psGetVolume = async (disk: number, partition: number) : Promise<IPSGetVolume[]> => {
+
+    // convert the json back
+    let ps = PowerShell.$`Get-Partition -DiskNumber ${disk} -PartitionNumber ${partition} | Get-Volume | ConvertTo-Json`;
+    let {stdout, stderr} = await ps;
+    let psOut = stdout?.toString() || "[]";
+    let psErr = stderr?.toString() || "";
+
+    if(psErr) throw new Error(psErr?.toString() || "Unknown Error");
+    let _data = JSON.parse(psOut);
+    let psData : IPSGetVolume[] = Array.isArray(_data) ? _data : [_data];
+    return psData;
+}
 
 
 export {
@@ -96,4 +118,5 @@ export {
     psGetPhysicalDisk,
     psGetPartition,
     wmicDiskDrive,
+    psGetVolume
 }

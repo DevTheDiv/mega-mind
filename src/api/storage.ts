@@ -1,7 +1,7 @@
 
 
 import os from 'os';
-import { psGetDisk, psGetPhysicalDisk, wmicDiskDrive } from "../modules/windows/storage.js";
+import { psGetDisk, psGetPhysicalDisk, wmicDiskDrive, psGetPartition } from "../modules/windows/storage.js";
 import { smartXAllInfo } from '../modules/tools/smartctl.js';
 
 import alphanumerize from 'alphanumerize';
@@ -52,9 +52,11 @@ class StorageManager {
             let paths = [DeviceID, `/dev/pd${Index}`, `/dev/sd${alpha}`];
 
             let smart = await smartXAllInfo(paths[1]);
-
-
             let { smart_support, power_on_time, temperature } = smart;
+
+
+            let partitions = await psGetPartition(Index);
+            
 
             let tmp : IStorage | null  = {
                 index: Index,

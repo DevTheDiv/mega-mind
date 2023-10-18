@@ -127,10 +127,33 @@ interface IPSGetPartition {
     Size: number;
     TransitionState: number;
     PSComputerName?: null;
+    Volume?: IPSGetVolume | null;
 }
 
-  
-
+interface IPSGetVolume {
+    CimClass: CimClass;
+    CimInstanceProperties?: (CimInstancePropertiesEntity)[] | null;
+    CimSystemProperties: CimSystemProperties;
+    OperationalStatus: string;
+    HealthStatus: string;
+    DriveType: string;
+    FileSystemType: string;
+    DedupMode: string;
+    ObjectId: string;
+    PassThroughClass?: null;
+    PassThroughIds?: null;
+    PassThroughNamespace?: null;
+    PassThroughServer?: null;
+    UniqueId: string;
+    AllocationUnitSize: number;
+    DriveLetter?: string | null;
+    FileSystem: string;
+    FileSystemLabel: string;
+    Path: string;
+    Size: number;
+    SizeRemaining: number;
+    PSComputerName?: null;
+}
 
 interface IWin32_DiskDrive {
     CimClass: CimClass;
@@ -195,6 +218,44 @@ interface IFSUtilSectorInfo {
     physicalBytesPerSectorForAtomicity: number,
     physicalBytesPerSectorForPerformance: number
 }
+
+interface IPSGetPartition {
+    CimClass: CimClass;
+    CimInstanceProperties?: (string)[] | null;
+    CimSystemProperties: CimSystemProperties;
+    OperationalStatus: string;
+    Type: string;
+    DiskPath: string;
+    ObjectId: string;
+    PassThroughClass?: null;
+    PassThroughIds?: null;
+    PassThroughNamespace?: null;
+    PassThroughServer?: null;
+    UniqueId: string;
+    AccessPaths?: (string)[] | null;
+    DiskId: string;
+    DiskNumber: number;
+    DriveLetter?: string | null;
+    GptType: string;
+    Guid: string;
+    IsActive: boolean;
+    IsBoot: boolean;
+    IsDAX?: boolean | null;
+    IsHidden: boolean;
+    IsOffline: boolean;
+    IsReadOnly?: boolean | null;
+    IsShadowCopy?: boolean | null;
+    IsSystem: boolean;
+    MbrType?: null;
+    NoDefaultDriveLetter?: boolean | null;
+    Offset: number;
+    PartitionNumber: number;
+    Size: number;
+    TransitionState: number;
+    PSComputerName?: null;
+}
+  
+  
 
 interface CimClass {
     CimSuperClassName: string;

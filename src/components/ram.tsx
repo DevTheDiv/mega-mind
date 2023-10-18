@@ -29,10 +29,12 @@ export default ({ram = []} : {ram: IRam[]}) => {
         let obj = data[i];
         let keys = Object.keys(obj);
         let values = Object.values(obj);
+        
 
         for(let j in keys) {
             let key = keys[j];
-            let value = values[j];
+            let value = values[j] || "";
+            
 
             if(Object.keys(minWidth).indexOf(key) === -1) continue;
 
@@ -54,12 +56,13 @@ export default ({ram = []} : {ram: IRam[]}) => {
     }
     return (
         <>
+        
         <Box width={"100%"}  flexDirection="column">
             <Box width={"100%"} padding={2} paddingBottom={1} paddingTop={1}>
                 <Text bold color="green">MEMORY</Text>
             </Box>
             <Box flexDirection="row" padding={0} paddingLeft={2} paddingRight={2} alignItems="center" width="100%">
-                <Box height="100%" flexDirection="row" width="100%" gap={3} paddingLeft={1} paddingRight={1}>
+                <Box height="100%" flexDirection="row" width="100%" gap={3} paddingLeft={0} paddingRight={0}>
                     <Box minWidth={minWidth.locator}><Text bold>Locator</Text></Box>
                     <Box minWidth={minWidth.partNumber} flexGrow={1}><Text bold>Product</Text></Box>
                     <Box minWidth={minWidth.serialNumber} flexGrow={1}><Text bold>Serial</Text></Box>
@@ -69,17 +72,19 @@ export default ({ram = []} : {ram: IRam[]}) => {
             </Box>
             {data.map((ram, i) => {
                 return (
-                    <Box flexDirection="row" padding={0} paddingLeft={2} paddingRight={2}  alignItems="center" key={i} >
-                        <Box height="100%" flexDirection="row" borderStyle="classic" width="100%" gap={1} paddingLeft={1} paddingRight={1}>
-                            <Box minWidth={minWidth.locator}><Text>{ram.bank} {ram.locator}</Text></Box>
-                            <Text>|</Text>
-                            <Box minWidth={minWidth.partNumber} flexGrow={1}><Text>{ram.partNumber}</Text></Box>
-                            <Text>|</Text>
-                            <Box minWidth={minWidth.serialNumber} flexGrow={1}><Text>{ram.serialNumber}</Text></Box>
-                            <Text>|</Text>
-                            <Box minWidth={minWidth.configuredSpeed}><Text>{ram.configuredSpeed}/{ram.speed}</Text></Box>
-                            <Text>|</Text>
-                            <Box minWidth={minWidth.capacity}><Text>{filesize(ram.capacity, {standard: "jedec"})}</Text></Box>
+                    <Box flexDirection="column" key={i} paddingLeft={2} paddingRight={2}>
+                        <Box flexDirection="row" padding={0} paddingLeft={0} paddingRight={0}  alignItems="center" key={i} >
+                            <Box height="100%" flexDirection="row" width="100%" gap={1} paddingLeft={0} paddingRight={0}>
+                                <Box minWidth={minWidth.locator}><Text>{ram.bank} {ram.locator}</Text></Box>
+                                <Text>|</Text>
+                                <Box minWidth={minWidth.partNumber} flexGrow={1}><Text>{ram.partNumber}</Text></Box>
+                                <Text>|</Text>
+                                <Box minWidth={minWidth.serialNumber} flexGrow={1}><Text>{ram.serialNumber}</Text></Box>
+                                <Text>|</Text>
+                                <Box minWidth={minWidth.configuredSpeed}><Text>{ram.configuredSpeed}/{ram.speed}</Text></Box>
+                                <Text>|</Text>
+                                <Box minWidth={minWidth.capacity}><Text>{filesize(ram.capacity, {standard: "jedec"})}</Text></Box>
+                            </Box>
                         </Box>
                     </Box>
                 );
