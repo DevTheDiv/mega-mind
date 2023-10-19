@@ -1,138 +1,234 @@
 
 import React, {useState, useEffect, FC} from 'react';
 // @ts-ignore
-import {Box, Text, Spacer} from 'ink';
-
+import {Box, Text, Spacer, measureElement} from 'ink';
 
 import {filesize} from "filesize";
 
+import {v4} from "uuid";
 
-let rows = 4;
-let width = 100 / rows + "%";
+
+
+interface disk {
+    scsi: string,
+    path: string,
+    model: string,
+    serial: string,
+    bus: string,
+    capacity: string,
+}
+
+interface smart {
+    temperature: string,
+    healthy: boolean,
+    hours: string,
+}
+
+interface partition {
+    partitionNumber: number,
+    identifier: string,
+    fileSystem: string,
+    label: string,
+    size: number,
+    sizeString: string,
+    sizeRemaining: number,
+    health: string,
+    active: boolean,
+    boot: boolean,
+    readonly: boolean,
+    percentageLeft: number,
+}
+
+let icons = {
+    encrypted: "⛓️",
+    locked: "🔒",
+    unlocked: "🔓",
+    key: "🔑",
+ 
+    active: "🎯",
+    bootable: "🥾",
+
+    windows: "🪟",
+    linux: "🐧",
+    apple: "🍎",
+
+    readonly: "🔏",
+
+    write: "✏️",
+    read: "📖",
+};
+
+// data can only be flat and have no object types
+let Disk = ({data, gap, minWidth} : {data: disk, gap:number, minWidth: any }) => {
+
+    let titles = Object.keys(data);
+    let values = Object.values(data);
+
+    return (
+        <Box width={"100%"} flexDirection="row" gap={gap} justifyContent="space-between">
+            <Box minWidth={minWidth.scsi}><Text>{data.scsi}</Text></Box>
+            <Text>│</Text>
+            <Box minWidth={minWidth.path}><Text>{data.path}</Text></Box>
+            <Text>│</Text>
+            <Box minWidth={minWidth.model} flexGrow={1}><Text>{data.model}</Text></Box>
+            <Text>│</Text>
+            <Box minWidth={minWidth.serial}><Text>{data.serial}</Text></Box>
+            <Text>│</Text>
+            <Box minWidth={minWidth.bus}><Text>{data.bus}</Text></Box>
+            <Text>│</Text>
+            <Box minWidth={minWidth.capacity}  alignSelf="flex-end" justifyContent="flex-end"><Text>{data.capacity}</Text></Box>
+            {/* { values.map((value, i) => <Box minWidth={minWidth[titles[i]]}><Text key={i}>{value}</Text></Box>) } */}
+        </Box>
+    );
+
+};
+
+let Smart = ({data, minWidth} : {data: smart,  minWidth: any }) => {
+    return (
+        <>
+            <Box  flexDirection="row" gap={1}>
+                <Text dimmed>†</Text>
+                <Box minWidth={minWidth.healthy}><Text dimmed color={data.healthy ? "green" : "red"}>{data.healthy ? "HEALTHY" : "UNHEALTHY"}</Text></Box>
+                <Text dimmed>○</Text>
+                <Box minWidth={minWidth.temperature}><Text dimmed>Temparature (cur/max): {data.temperature}</Text></Box>
+                <Text dimmed>○</Text> 
+                <Box minWidth={minWidth.hours}><Text dimmed color="blue">Hours: {data.hours}</Text></Box>
+            </Box>
+        </>
+    )
+
+}
+
+let Partition = ({data, minWidth, gap = 0} : {data: partition, minWidth: any, gap: number}) => {
+    let flags = [
+        data.readonly ? "R" : "*" , 
+        data.boot ? "B" : "*",
+        data.active ? "A" : "*"
+    ];
+
+    let healthState = data.health.toUpperCase();
+    let healthColor = "red";
+    if(healthState === "HEALTHY") healthColor = "green";
+    else if(healthState === "UNKNOWN") healthColor = "yellow";
+
+    return (
+    <>
+        <Box width={"100%"} flexDirection="row" gap={gap} justifyContent="space-between">
+            <Box minWidth={minWidth.partitionNumber + minWidth.identifier + 9}><Text>╰ Part {data.partitionNumber}  </Text><Text bold>{data.identifier}</Text></Box>
+            <Box minWidth={3}><Text>{flags.join("")}</Text></Box>
+            <Box minWidth={minWidth.fileSystem}><Text>{data.fileSystem}</Text></Box>
+            <Box minWidth={minWidth.health}><Text color={healthColor}>{healthState}</Text></Box>
+            <Box minWidth={minWidth.label} flexGrow={1}><Text>{data.label}</Text></Box>
+            <Box minWidth={minWidth.percentageLeft}><Text>{data.percentageLeft}%</Text></Box>
+            <Box minWidth={minWidth.sizeString} alignSelf="flex-end" justifyContent="flex-end"><Text>{data.sizeString}</Text></Box>
+        </Box>
+    </>
+    );
+};
+
+
+function maxSizes(data : {[key:string] : any}, obj : object) {
+
+    for(let key in data) {
+        //@ts-ignore
+        let value = data[key];
+        //@ts-ignore
+        obj[key] = obj[key] > `${value}`.length ? obj[key] : `${value}`.length;
+    }
+}
+
 
 
 export default ({storage = []} : {storage: IStorage[]}) => {
-    let data = storage;
 
-    let minWidth : {
-        serialNumber: number,
-        model: number,
-        busType: number,
-        paths: number,
-        useableCapacity: number,
-        scsi: number,
-    } = {
-        serialNumber: 0,
-        model: 0,
-        busType: 0,
-        paths: 0,
-        useableCapacity: 0,
-        scsi: 0,
-    };
+    let smartctl : {[key:string] : smart } = {};
+    let disks : {[key:string] : disk } = {};
+    let diskpartitions : {[key:string] : partition[] } = {};
+    
+    let maxSizesPartitions = {};
+    let maxSizesDisks = {};
+    let maxSizesSmart = {};
 
     for(let i in storage) {
-        let obj = storage[i];
-        let keys = Object.keys(obj);
-        let values = Object.values(obj);
+        let {scsi, paths, model, serialNumber, uniqueId, busType, useableCapacity, smart, partitions} = storage[i];
 
-        for(let j in keys) {
-            let key = keys[j];
-            let value = values[j] || "";
+        let uuid = v4();
+        let _d = {
+            scsi: `${scsi.channel}:${scsi.host}:${scsi.lun}:${scsi.target}`,
+            path: paths[0],
+            model: model,
+            serial: serialNumber || uniqueId,
+            bus: busType,
+            capacity: filesize(useableCapacity, {round: 2}),
+        };
+        maxSizes(_d, maxSizesDisks);
+        disks[uuid] = _d;
 
-            if(Object.keys(minWidth).indexOf(key) === -1) continue;
+        if(smart?.enabled) {
+            let temperature = `${smart.temperature}/${smart.temperatureMax}℃ `;
+            let _s = {
+                temperature,
+                healthy: smart.healthy,
+                hours: smart.powerOnHours + "",
+            };
+            maxSizes(_s, maxSizesSmart);
+            smartctl[uuid] = _s;
+        }
 
-            if(key === "paths") {
-                let p = value[0];
-                if(p.length > minWidth[key]) minWidth[key] = p.length;
+        if(partitions.length) {
+            diskpartitions[uuid] = [];
+            
+            for(let p in partitions) {
+                let partition = partitions[p];
+                let {partitionNumber, identifier, size, active, boot, readonly} = partition;
+                let { fileSystem = "UNKNOWN", label = "UNKNOWN", size: volumeSize = 1, sizeRemaining = 1, health = "UNKNOWN" } = partition.volume || {};
+                
+                let percentageLeft = Math.round(sizeRemaining / volumeSize  * 100);
+
+                let _p = {
+                    partitionNumber,
+                    identifier,
+                    fileSystem,
+                    label,
+                    size,
+                    sizeString: filesize(size, {round: 2}),
+                    capacity: filesize(useableCapacity, {round: 2}),
+                    sizeRemaining,
+                    health,
+                    active,
+                    boot,
+                    readonly,
+                    percentageLeft
+                };
+                maxSizes(_p, maxSizesPartitions);
+                diskpartitions[uuid].push(_p);
             }
-            if(key === "useableCapacity") {
-                let p = filesize(value, {round: 2});
-                if(p.length > minWidth[key]) minWidth[key] = p.length;
-            }
-            if(key === "scsi") {
-                let p = Object.values(value).join(":");
-                if(p.length > minWidth[key]) minWidth[key] = p.length;
-
-            }
-            // @ts-ignore
-            else if(value.length > minWidth[key]) minWidth[key] = value.length;
         }
     }
-
     
     return (
         <>
-        <Box width={"100%"}  flexDirection="column"  rowGap={1} paddingTop={1} paddingBottom={1}>
-            <Box width={"100%"} padding={2} paddingBottom={0} paddingTop={0}>
+        <Box width={"100%"}  flexDirection="column"  rowGap={1} padding={1} paddingLeft={2} paddingRight={2} >
+            <Box width={"100%"}>
                 <Text bold color="green">STORAGE</Text>
-            </Box>       
-            {data.map((device, i) => {
-                return (
-                    <Box key={i} flexDirection="column" width="100%" paddingLeft={2} paddingRight={2}>
-                        <Box flexDirection="row" width="100%" padding={0} paddingLeft={0} paddingRight={0}>
-                            <Box height="100%" flexDirection="row" width="100%" columnGap={2} justifyContent="space-between">
-                                <Box minWidth={minWidth.scsi}><Text>{device.scsi.channel}:{device.scsi.host}:{device.scsi.lun}:{device.scsi.target}</Text></Box>
-                                <Text>│</Text>
-                                <Box minWidth={minWidth.paths}><Text>{device.paths[0]}</Text></Box>
-                                <Text>│</Text>
-                                <Box minWidth={minWidth.model} flexGrow={1}><Text>{device.model}</Text></Box>
-                                <Text>│</Text>
-                                <Box minWidth={minWidth.serialNumber} flexGrow={1}><Text>{device.serialNumber || device.uniqueId}</Text></Box>
-                                <Text>│</Text>
-                                <Box minWidth={minWidth.busType}><Text>{device.busType}</Text></Box>
-                                <Text>│</Text>
-                                <Box minWidth={minWidth.useableCapacity}  alignSelf="flex-end" justifyContent="flex-end"><Text>{filesize(device.useableCapacity, {round: 2})}</Text></Box>
-                            </Box>
-                        </Box>
+            </Box>
+            <Box width={"100%"} flexDirection="column" gap={1}>
+            {
+                Object.keys(disks).map((key, i) =>
+                    <Box key={i} flexDirection="column" width="100%">
+                        <Disk data={disks[key]} gap={1} minWidth={maxSizesDisks}/>
                         {
-                            device.smart?.enabled ? 
-                            <Box  flexDirection="row" padding={0} paddingLeft={0} paddingRight={0}  alignItems="center" gap={2}>
-                                <Text dimmed>🩺</Text>
-                                <Text dimmed color={device.smart.healthy ? "green" : "red"}>Healthy: {`${device.smart.healthy}`}</Text>
-                                <Text dimmed>○</Text>
-                                <Text dimmed color={device.smart.temperature < device.smart.temperatureMax? "green" : "red"}>Temparature (cur/max): {`${device.smart.temperature}/${device.smart.temperatureMax}`}℃ </Text>
-                                <Text dimmed>○</Text>
-                                <Text dimmed color="blue">Hours: {`${device.smart.powerOnHours}`}</Text>
-                            </Box>
-                            :
-                            <></>
+                            smartctl[key] ? <Smart data={smartctl[key]} minWidth={maxSizesSmart} /> : <></>
                         }
                         {
-                            device.partitions.map((partition, i) => {
-                                
-                                let utilized = (partition.volume?.sizeRemaining || 1) / (partition.volume?.size || 1);
-                                let healthState = (partition.volume?.health || "Unknown").toString().toUpperCase();
-                                
-                                let healthColor = "red";
-                                if(healthState === "HEALTHY") healthColor = "green";
-                                else if(healthState === "UNKNOWN") healthColor = "yellow";
-
- 
-                                
-                                let flags = [];
-                                if(partition.readonly) flags.push("RO");
-                                if(partition.boot) flags.push("B");
-                                if(partition.active) flags.push("A");
-
-                                return (
-                                    <>
-                                        <Box key={i} flexDirection="row" gap={2} justifyContent="space-between">
-                                            <Text>╰ Part {partition.partitionNumber} ({partition.identifier})</Text>
-                                            <Text>[{flags.join(",")}]</Text>
-                                            <Text>{partition.volume?.fileSystem}</Text>
-                                            <Text>{partition.volume?.label}</Text>
-                                            <Text color={healthColor}>{partition.volume?.health}</Text>
-                                            <Text>{100 - Math.round(utilized * 100)}%</Text>
-                                            <Text>{filesize(partition.size, {round: 2, standard: "jedec"})}</Text>
-                                        </Box>
-                                    </>
-                                );
-                            })
+                            diskpartitions[key] ? diskpartitions[key].map((partition, i) => {
+                                return <Partition key={i} data={partition} minWidth={maxSizesPartitions} gap={2}/>
+                            }) : <></>
                         }
-                        
                     </Box>
-                );
-            })}
+                )
+            }
+            </Box>
         </Box>
         </>
     );

@@ -83,6 +83,7 @@
   },
   "dependencies": {
     "@types/byte-size": "^8.1.0",
+    "@types/uuid": "^9.0.6",
     "@wtfcode/byte-converter": "^2.0.8",
     "alphanumerize": "^1.0.0",
     "change-case-all": "^1.0.15",
@@ -97,6 +98,7 @@
     "inquirer": "^9.2.11",
     "node-powershell": "^5.0.1",
     "papaparse": "^5.4.1",
-    "react": "^18.2.0"
+    "react": "^18.2.0",
+    "uuid": "^9.0.1"
   }
 }
